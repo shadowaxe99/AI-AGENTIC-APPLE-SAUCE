@@ -1,4 +1,4 @@
-name: Build and Deploy ChatGPT Plugin API to Google Compute Engine
+name: Build and Deploy REST API to Google Compute Engine
 
 on:
   push:
@@ -52,8 +52,8 @@ jobs:
         with:
           push: true
           tags: ${{ env.IMAGE_TAG }}
-          cache-from: type=gha,scope=e2b-chatgpt-plugin-api
-          cache-to: type=gha,scope=e2b-chatgpt-plugin-api
+          cache-from: type=gha,scope=e2b-rest-api
+          cache-to: type=gha,scope=e2b-rest-api
 
       - name: Delete old docker images from the instance
         run: |- 
