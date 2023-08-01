@@ -9,6 +9,8 @@ import express, {
 import { ValidateError } from 'tsoa'
 import morgan from 'morgan'
 import cors from 'cors'
+import path from 'path'
+import { readFileSync } from 'fs'
 
 import { RegisterRoutes } from './generated/routes'
 import { defaultPort } from './constants'
@@ -23,6 +25,23 @@ app.use(
   morgan('tiny'),
   text(),
   json(),
+)
+
+
+function loadStaticFile(relativePath: string) {
+  return readFileSync(path.join(__dirname, relativePath), 'utf-8')
+}
+
+const apiSpec = loadStaticFile('../openapi.yaml')
+
+app.get(
+  '/openapi.yaml',
+  (_, res) => {
+    res
+      .setHeader('Content-Type', 'text/yaml')
+      .status(200)
+      .send(apiSpec)
+  }
 )
 
 
