@@ -63,7 +63,7 @@ curl --request POST \
 }
 ```
 
-> You can check a Python API client generated for almost identical API [here](https://github.com/e2b-dev/e2b/tree/main/api-service/playground_client) and a wrapper for this API so an agent written in Pyhton can it use as a playground [here](https://github.com/e2b-dev/e2b/tree/main/api-service/session/playground).
+> You can check a Python API client generated for almost identical API [here](https://github.com/e2b-dev/e2b/tree/main/api-service/playground_client) and a wrapper for this API so an agent written in Python can it use as a playground [here](https://github.com/e2b-dev/e2b/tree/main/api-service/session/playground).
 
 ## Endpoints
 ### Sessions
