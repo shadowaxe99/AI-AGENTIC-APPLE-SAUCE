@@ -2,7 +2,7 @@
   "entryFile": "src/index.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": [
-    "src/plugin/*Controller.ts"
+    "src/**/*Controller.ts"
   ],
   "ignore": [
     "src/generated"

@@ -3,6 +3,7 @@ import NodeCache from 'node-cache'
 
 import { CachedProcess, RunProcessParams } from './process'
 import { maxSessionLength } from '../constants'
+import { Environment } from './environment'
 
 export const sessionCache = new NodeCache({
   stdTTL: maxSessionLength,
@@ -35,7 +36,7 @@ export class CachedSession {
    * 
    * @param envID 
    */
-  constructor(envID: string) {
+  constructor(envID: Environment) {
     this.session = new Session({
       id: envID,
       onClose: () => {
@@ -117,7 +118,7 @@ export class CachedSession {
     return cachedProcess
   }
 
-  static async findOrStartSession({ sessionID, envID }: { sessionID: string, envID: string }) {
+  static async findOrStartSession({ sessionID, envID }: { sessionID: string, envID: Environment }) {
     try {
       return CachedSession.findSession(sessionID)
     } catch {

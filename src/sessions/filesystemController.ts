@@ -23,7 +23,7 @@ interface ReadFilesystemFileResponse {
 
 @Route('sessions')
 export class FilesystemController extends Controller {
-  @Get('{sessionID}/filesystem/dir')
+  @Get('{sessionID}/filesystem/dirs')
   public async listFilesystemDir(
     @Path() sessionID: string,
     @Query() path: string,
@@ -39,7 +39,7 @@ export class FilesystemController extends Controller {
     }
   }
 
-  @Put('{sessionID}/filesystem/dir')
+  @Put('{sessionID}/filesystem/dirs')
   public async makeFilesystemDir(
     @Path() sessionID: string,
     @Query() path: string,
@@ -63,7 +63,15 @@ export class FilesystemController extends Controller {
       .remove(path)
   }
 
-  @Get('{sessionID}/filesystem/file')
+  /**
+   * 
+   * Right now the returned content of the file will be UTF-8 encoded.
+   * 
+   * @param sessionID 
+   * @param path 
+   * @returns 
+   */
+  @Get('{sessionID}/filesystem/files')
   public async readFilesystemFile(
     @Path() sessionID: string,
     @Query() path: string,
@@ -79,7 +87,15 @@ export class FilesystemController extends Controller {
     }
   }
 
-  @Put('{sessionID}/filesystem/file')
+  /**
+   * 
+   * Right now the content of the file must be UTF-8 encoded.
+   * 
+   * @param sessionID 
+   * @param path 
+   * @param content 
+   */
+  @Put('{sessionID}/filesystem/files')
   public async writeFilesystemFile(
     @Path() sessionID: string,
     @Query() path: string,

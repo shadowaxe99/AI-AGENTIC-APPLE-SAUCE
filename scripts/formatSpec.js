@@ -47,29 +47,8 @@ if (paths) {
           delete paths[key][method]['security']
         }
       }
-
-      // Delete openai-conversation-id header if exists - this should not be in spec for the plugin, it is automatically added by openai
-      if (paths[key][method]['parameters']) {
-        const conversationIDParameterIdx = paths[key][method]['parameters'].findIndex((parameter) => parameter.name === 'openai-conversation-id' && parameter.in === 'header')
-        if (conversationIDParameterIdx !== -1) {
-          paths[key][method]['parameters'].splice(conversationIDParameterIdx, 1)
-        }
-      }
     })
   })
-}
-
-const info = spec['info']
-if (info) {
-  // Delete old info - it is generated from package.json with excessive fields
-  delete spec['info']
-}
-
-// Add new info
-spec['info'] = {
-  title: 'E2B Code Interpreter',
-  description: 'A plugin that allows writting and reading files and running processes in a cloud environment.',
-  version: 'v1',
 }
 
 fs.writeFileSync('openapi.yaml', yaml.dump(spec, { sortKeys: true, indent: 2, condenseFlow: true, noArrayIndent: true, noCompatMode: true, lineWidth: -1 }))

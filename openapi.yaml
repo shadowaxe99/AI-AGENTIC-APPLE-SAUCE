@@ -1,17 +1,20 @@
 components:
   schemas:
-    CommandResponse:
+    EntryInfo:
       additionalProperties: false
       properties:
-        stderr:
-          description: Standard error output from the command
-          type: string
-        stdout:
-          description: Standard output from the command
+        isDir:
+          type: boolean
+        name:
           type: string
       required:
-      - stderr
-      - stdout
+      - isDir
+      - name
+      type: object
+    EnvVars:
+      additionalProperties:
+        type: string
+      properties: {}
       type: object
     Environment:
       description: |-
@@ -29,36 +32,153 @@ components:
       - DotNET
       format: env
       type: string
+    ListFilesystemDirResponse:
+      additionalProperties: false
+      properties:
+        entries:
+          items:
+            $ref: '#/components/schemas/EntryInfo'
+          type: array
+      required:
+      - entries
+      type: object
+    OpenPort:
+      additionalProperties: false
+      properties:
+        Ip:
+          type: string
+        Port:
+          format: double
+          type: number
+        State:
+          type: string
+      required:
+      - State
+      - Ip
+      - Port
+      type: object
+    OutStderrResponse:
+      additionalProperties: false
+      properties:
+        line:
+          type: string
+        timestamp:
+          format: double
+          type: number
+        type:
+          $ref: '#/components/schemas/OutType.Stderr'
+      required:
+      - type
+      - timestamp
+      - line
+      type: object
+    OutStdoutResponse:
+      additionalProperties: false
+      properties:
+        line:
+          type: string
+        timestamp:
+          format: double
+          type: number
+        type:
+          $ref: '#/components/schemas/OutType.Stdout'
+      required:
+      - type
+      - timestamp
+      - line
+      type: object
+    OutType:
+      enum:
+      - Stdout
+      - Stderr
+      type: string
+    OutType.Stderr:
+      enum:
+      - Stderr
+      type: string
+    OutType.Stdout:
+      enum:
+      - Stdout
+      type: string
+    ProcessResponse:
+      additionalProperties: false
+      properties:
+        finished:
+          type: boolean
+        processID:
+          type: string
+        stderr:
+          items:
+            $ref: '#/components/schemas/OutStderrResponse'
+          type: array
+        stdout:
+          items:
+            $ref: '#/components/schemas/OutStdoutResponse'
+          type: array
+      required:
+      - stderr
+      - stdout
+      - processID
+      - finished
+      type: object
+    ReadFilesystemFileResponse:
+      additionalProperties: false
+      properties:
+        content:
+          type: string
+      required:
+      - content
+      type: object
+    SessionResponse:
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        ports:
+          items:
+            $ref: '#/components/schemas/OpenPort'
+          type: array
+      required:
+      - id
+      - ports
+      type: object
+    StartProcessParams:
+      additionalProperties: false
+      properties:
+        cmd:
+          type: string
+        envVars:
+          $ref: '#/components/schemas/EnvVars'
+        rootdir:
+          type: string
+      required:
+      - cmd
+      type: object
 info:
-  description: A plugin that allows writting and reading files and running processes in a cloud environment.
-  title: E2B Code Interpreter
-  version: v1
+  contact:
+    email: hello@e2b.dev
+    name: FoundryLabs, Inc.
+    url: https://e2b.dev
+  description: e2b REST API
+  license:
+    name: SEE LICENSE IN LICENSE
+  title: '@e2b/rest-api'
+  version: 0.1.0
 openapi: 3.0.0
 paths:
-  /commands:
+  /sessions:
     post:
-      operationId: RunCommand
-      parameters:
-      - description: Environment to run the command in
-        in: query
-        name: env
-        required: false
-        schema:
-          $ref: '#/components/schemas/Environment'
+      operationId: CreateSessions
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
               properties:
-                command:
-                  description: Command to run
-                  type: string
-                workDir:
-                  description: Working directory to run the command in
-                  type: string
+                envID:
+                  $ref: '#/components/schemas/Environment'
               required:
-              - command
-              - workDir
+              - envID
               type: object
         required: true
       responses:
@@ -66,21 +186,65 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CommandResponse'
-          description: JSON containing the standard output and error output of the command
-      summary: Run a command in a shell
-  /files:
-    get:
-      operationId: ReadFile
+                $ref: '#/components/schemas/SessionResponse'
+          description: Ok
+  /sessions/{sessionID}:
+    delete:
+      operationId: DeleteSession
       parameters:
-      - description: Environment where to read the file from
-        in: query
-        name: env
-        required: false
+      - in: path
+        name: sessionID
+        required: true
         schema:
-          $ref: '#/components/schemas/Environment'
-      - description: Path to the file to read
-        in: query
+          type: string
+      responses:
+        '204':
+          description: No content
+    get:
+      description: |-
+
+        Use this endpoint to periodically refresh the session - if there was no request to the session for 10 minutes, it will be deleted.
+      operationId: GetSession
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+          description: Ok
+  /sessions/{sessionID}/filesystem:
+    delete:
+      operationId: DeleteFilesystemEntry
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No content
+  /sessions/{sessionID}/filesystem/dirs:
+    get:
+      operationId: ListFilesystemDir
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: query
         name: path
         required: true
         schema:
@@ -88,33 +252,62 @@ paths:
       responses:
         '200':
           content:
-            text/plain; charset=UTF-8:
+            application/json:
               schema:
-                type: string
-          description: Contents of the file as a string
-        '404':
+                $ref: '#/components/schemas/ListFilesystemDirResponse'
+          description: Ok
+    put:
+      operationId: MakeFilesystemDir
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No content
+  /sessions/{sessionID}/filesystem/files:
+    get:
+      description: |-
+
+        Right now the returned content of the file will be UTF-8 encoded.
+      operationId: ReadFilesystemFile
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
           content:
             application/json:
               schema:
-                properties:
-                  reason:
-                    type: string
-                required:
-                - reason
-                type: object
-          description: Response to send if the file is not found
-      summary: Read the contents of a file at the given path
+                $ref: '#/components/schemas/ReadFilesystemFileResponse'
+          description: Ok
     put:
-      operationId: WriteFile
+      description: |-
+
+        Right now the content of the file must be UTF-8 encoded.
+      operationId: WriteFilesystemFile
       parameters:
-      - description: Environment where to write the file
-        in: query
-        name: env
-        required: false
+      - in: path
+        name: sessionID
+        required: true
         schema:
-          $ref: '#/components/schemas/Environment'
-      - description: Path to the file to write
-        in: query
+          type: string
+      - in: query
         name: path
         required: true
         schema:
@@ -125,7 +318,6 @@ paths:
             schema:
               properties:
                 content:
-                  description: Content to write to the file
                   type: string
               required:
               - content
@@ -134,7 +326,114 @@ paths:
       responses:
         '204':
           description: No content
-      summary: Write content to a file at the given path
+  /sessions/{sessionID}/processes:
+    post:
+      operationId: StartProcess
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - description: if true the request will wait until the process ends and then return the `stdout`, `stderr` and `processID`.
+        in: query
+        name: wait
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartProcessParams'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessResponse'
+          description: '`processID` and all `stdout` and `stderr` that the process outputted until now.'
+  /sessions/{sessionID}/processes/{processID}:
+    delete:
+      operationId: StopProcess
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: processID
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: results
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessResponse'
+          description: Ok
+    get:
+      operationId: GetProcess
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: processID
+        required: true
+        schema:
+          type: string
+      - description: if true the request will wait until the process ends and then return the `stdout`, `stderr` and `processID`.
+        in: query
+        name: wait
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessResponse'
+          description: '`processID` and all `stdout` and `stderr` that the process outputted until now.'
+  /sessions/{sessionID}/processes/{processID}/stdin:
+    post:
+      operationId: WriteProcessStdin
+      parameters:
+      - in: path
+        name: sessionID
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: processID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                stdin:
+                  type: string
+              required:
+              - stdin
+              type: object
+        required: true
+      responses:
+        '204':
+          description: No content
 servers:
 - description: Local development
   url: http://localhost:3000

@@ -10,6 +10,7 @@ import {
 import { OpenedPort as OpenPort } from '@devbookhq/sdk'
 
 import { CachedSession } from './session'
+import { Environment } from './environment'
 
 interface SessionResponse {
   id: string
@@ -20,7 +21,7 @@ interface SessionResponse {
 export class SessionsController extends Controller {
   @Post()
   public async createSessions(
-    @BodyProp() envID: string,
+    @BodyProp() envID: Environment,
   ): Promise<SessionResponse> {
     const cachedSession = await new CachedSession(envID).init()
 
@@ -39,6 +40,13 @@ export class SessionsController extends Controller {
       .delete()
   }
 
+  /**
+   * 
+   * Use this endpoint to periodically refresh the session - if there was no request to the session for 10 minutes, it will be deleted.
+   * 
+   * @param sessionID 
+   * @returns 
+   */
   @Get('{sessionID}')
   public async getSession(
     @Path() sessionID: string,

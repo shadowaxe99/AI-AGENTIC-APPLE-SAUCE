@@ -1,6 +1,5 @@
 # Dev
 ## Issues
-- Work on plugin manifest and OpenAPI spec descriptions
 - Deploy on normal url (GCP load balancer + cloudflare)
 - Add prettier
 - Finish GCP deployment setup
@@ -17,20 +16,10 @@
 - Add vale
 - Add issue/PR templates
 - Improve README.md
-- Add support for function calling OpenAI API
 - Explain how to contribute - what commands to call to generate and which docs/strings to modify to add to spec
 - **Move to ubuntu**
 - **Fix clock drift**
 - Fix devbookd freeze
 - Manually check all envs
 - Add url of the localhost server to the spec only in dev env
-- Post request confirmation flow
-- Remove text body parsers? (chatGPT doesn't play well with plain text body)
-- Make issues from user issues
 - Can we document the response without creating return types?
-- ChatGPT tries to use read file even for listing directory content
-- Handle in which env are the operations executed because sometimes ChatGPT will switch to another env between operations
-- Enable diff edits to save context
-- ChatGPT sometimes insists that it doesn't have capacity for editing files (on GitHub) - maybe we should rename "code interpreter" to something less obvious that it can edit downloaded repo
-
-> we can change the API for the plugins whenever we want - we don't need to think about backward compatibility that much because the API is understood again everytime the plugin is used.
