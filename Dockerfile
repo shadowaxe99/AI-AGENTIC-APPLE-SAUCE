@@ -25,9 +25,6 @@ FROM node:lts-slim
 
 WORKDIR /app
 
-RUN mkdir -p .well-known
-COPY .well-known/ai-plugin.json ./.well-known/ai-plugin.json
-
 COPY --from=modules ./app .
 COPY --from=build ./app/lib ./lib
 COPY --from=build ./app/openapi.yaml .
