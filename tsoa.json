@@ -14,7 +14,7 @@
     "servers": [
         {
           "url": "https://api.e2b.usedevbook.com",
-          "description": "Local development"
+          "description": "Development"
         }
       ]
     },
