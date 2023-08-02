@@ -100,7 +100,7 @@ We're working on a native Python SDK. Please use raw HTTP requests in the meanti
 Create a new Nodejs session:
 ```bash
 curl --request POST \
-  --url http://localhost:3000/sessions \
+  --url https://api.e2b.usedevbook.com \
   --header 'Content-Type: application/json' \
   --data '{
   "envID": "Nodejs"
@@ -117,7 +117,7 @@ curl --request POST \
 Execute a command in the session:
 ```bash
 curl --request POST \
-  --url 'http://localhost:3000/sessions/sojem4y9-fce131d5/processes?wait=true' \
+  --url 'https://api.e2b.usedevbook.com/sessions/sojem4y9-fce131d5/processes?wait=true' \
   --header 'Content-Type: application/json' \
   --data '{
   "cmd": "echo 22",
