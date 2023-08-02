@@ -25,7 +25,7 @@ These cloud environments are meant to be used for agents. Like a sandboxed playg
 ## Early preview usage
 
 ### JS/TS SDK
-Use our an SDK from our old project [here](https://github.com/devbookhq/sdk).
+Use SDK from our old project [here](https://github.com/devbookhq/sdk).
 
 ```sh
 npm i @devbookhq/sdk
