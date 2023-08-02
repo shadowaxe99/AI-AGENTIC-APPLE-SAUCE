@@ -20,7 +20,8 @@ We give you a full cloud development environment that's sandboxed. That means:
 
 These cloud environments are meant to be used for agents. Like a sandboxed playgrounds, where the agent can do whatever it wants.
 
-
+## Example usage
+Check out the [e2b plugin for ChatGPT](https://github.com/e2b-dev/chatgpt-plugin/tree/main) where we used this API.
 
 ## Early preview usage
 
