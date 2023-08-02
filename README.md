@@ -33,6 +33,8 @@ npm i @devbookhq/sdk
 
 #### Initialize new env session
 ```typescript
+import { Session } from '@devbookhq/sdk'
+
 const session = new Session({
   id: 'Nodejs', // Can also be one of "Nodejs", "Go", "Bash", "Rust", "Python3", "PHP", "Java", "Perl", "DotNET"
   onDisconnect: () => console.log('disconnect'),
