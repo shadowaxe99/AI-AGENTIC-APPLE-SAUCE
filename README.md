@@ -10,7 +10,7 @@
 
 The E2B REST API provides an interface for managing cloud environments for AI agents.
 
-We give you a full cloud development environment that's sandboxed. That means:
+This API gives your agent a full cloud development environment that's sandboxed. That means:
 
 - Access to Linux OS
 - Using filesystem (create, list, and delete files and dirs)
