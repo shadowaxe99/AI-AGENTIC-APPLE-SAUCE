@@ -8,7 +8,7 @@
 		</a>
 	</p>
 
-The E2B REST API provides an interface for managing development environments and their filesystems and processes.
+The E2B REST API provides an interface for managing cloud environments for AI agents.
 
 We give you a full cloud development environment that's sandboxed. That means:
 
