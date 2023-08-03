@@ -13,8 +13,8 @@
     "spec": {
     "servers": [
         {
-          "url": "http://localhost:3000",
-          "description": "Local development"
+          "url": "https://api.e2b.usedevbook.com",
+          "description": "Development"
         }
       ]
     },

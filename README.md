@@ -8,9 +8,9 @@
 		</a>
 	</p>
 
-The E2B REST API provides an interface for managing development environments and their filesystems and processes.
+The E2B REST API provides an interface for managing cloud environments for AI agents.
 
-We give you a full cloud development environment that's sandboxed. That means:
+This API gives your agent a full cloud development environment that's sandboxed. That means:
 
 - Access to Linux OS
 - Using filesystem (create, list, and delete files and dirs)
@@ -21,10 +21,87 @@ We give you a full cloud development environment that's sandboxed. That means:
 These cloud environments are meant to be used for agents. Like a sandboxed playgrounds, where the agent can do whatever it wants.
 
 ## Example usage
+Check out the [e2b plugin for ChatGPT](https://github.com/e2b-dev/chatgpt-plugin/tree/main) where we used this API.
+
+## Early preview usage
+
+### JS/TS SDK
+Use SDK from our old project [here](https://github.com/devbookhq/sdk).
+
+```sh
+npm i @devbookhq/sdk
+```
+
+#### Initialize new env session
+```typescript
+import { Session } from '@devbookhq/sdk'
+
+const session = new Session({
+  id: 'Nodejs', // Can also be one of "Nodejs", "Go", "Bash", "Rust", "Python3", "PHP", "Java", "Perl", "DotNET"
+  onDisconnect: () => console.log('disconnect'),
+  onReconnect: () => console.log('reconnect'),
+  onClose: () => console.log('close'),
+})
+```
+
+#### Use filesystem inside cloud environment
+```typescript
+// List
+const dirBContent = await session.filesystem.list('/dirA/dirB')
+
+// Write
+// This will create a new file 'file.txt' inside the dir 'dirB' with the content 'Hello world'.
+await session.filesystem.write('/dirA/dirB/file.txt', 'Hello World')
+
+// Read
+const fileContent = await session.filesystem.read('/dirA/dirB/file.txt')
+
+// Remove
+// Remove a file.
+await session.filesystem.remove('/dirA/dirB/file.txt')
+// Remove a directory and all of its content.
+await session.filesystem.remove('/dirA')
+
+// Make dir
+// Creates a new directory 'dirC' and also 'dirA' and 'dirB' if those directories don't already exist.
+await session.filesystem.makeDir('/dirA/dirB/dirC')
+
+// Watch dir for changes
+const watcher = session.filesystem.watchDir('/dirA/dirB')
+watcher.addEventListener(fsevent => {
+  console.log('Change inside the dirB', fsevent)
+})
+await watcher.start()
+```
+
+#### Start process inside cloud environment
+```typescript
+const proc = await session.process.start({
+  cmd: 'echo 2',
+  onStdout: stdout => consoel.log(stdout),
+  onStderr: stderr => console.log(stderr),
+  onExit: () => console.log('exit'),
+  envVars: { ['ENV']: 'prod' },
+  rootdir: '/',
+  processID: '<process-id>',
+})
+
+await proc.kill()
+
+await proc.sendStdin('\n')
+
+console.log(proc.processID)
+```
+
+
+### Python SDK
+We're working on a native Python SDK. Please use raw HTTP requests in the meantime.
+
+### HTTP requests
 Create a new Nodejs session:
 ```bash
 curl --request POST \
-  --url http://localhost:3000/sessions \
+  --url 'https://api.e2b.usedevbook.com/sessions' \
   --header 'Content-Type: application/json' \
   --data '{
   "envID": "Nodejs"
@@ -41,7 +118,7 @@ curl --request POST \
 Execute a command in the session:
 ```bash
 curl --request POST \
-  --url 'http://localhost:3000/sessions/sojem4y9-fce131d5/processes?wait=true' \
+  --url 'https://api.e2b.usedevbook.com/sessions/sojem4y9-fce131d5/processes?wait=true' \
   --header 'Content-Type: application/json' \
   --data '{
   "cmd": "echo 22",
@@ -63,7 +140,7 @@ curl --request POST \
 }
 ```
 
-> You can check a Python API client generated for almost identical API [here](https://github.com/e2b-dev/e2b/tree/main/api-service/playground_client) and a wrapper for this API so an agent written in Pyhton can it use as a playground [here](https://github.com/e2b-dev/e2b/tree/main/api-service/session/playground).
+> You can check a Python API client generated for almost identical API [here](https://github.com/e2b-dev/e2b/tree/main/api-service/playground_client) and a wrapper for this API so an agent written in Python can use it as a playground [here](https://github.com/e2b-dev/e2b/tree/main/api-service/session/playground).
 
 ## Endpoints
 ### Sessions
