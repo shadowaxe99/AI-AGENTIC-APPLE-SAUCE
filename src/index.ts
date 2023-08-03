@@ -27,7 +27,6 @@ app.use(
   json(),
 )
 
-
 function loadStaticFile(relativePath: string) {
   return readFileSync(path.join(__dirname, relativePath), 'utf-8')
 }
